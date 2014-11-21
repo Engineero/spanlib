@@ -39,6 +39,7 @@ url="http://spanlib.sf.net"
 # Gather up all the files we need
 spanlib_files = ['src/spanlib.pyf', 'src/spanlib_pywrap.f90', 'src/spanlib.f90',  'src/anaxv.f90']
 anaxv_files = ['src/anaxv.pyf', 'src/anaxv.f90']
+optimec_files = ['src/optimec.pyf', 'src/optimec.f90', 'src/lbfgs.f']
 
 
 # Paths for libs
@@ -94,7 +95,7 @@ kwext = dict(libraries=libs, library_dirs=libdirs, extra_link_args=extra_link_ar
 if __name__=='__main__':
     
     # Generate pyf files
-    crackfortran.f77modulename = '_fortran'
+    crackfortran.f77modulename = '_core'
     pyfcode = crackfortran.crack2fortran(crackfortran.crackfortran(['src/spanlib_pywrap.f90']))
     f = open('src/spanlib.pyf', 'w')
     f.write(pyfcode)
@@ -102,6 +103,11 @@ if __name__=='__main__':
     crackfortran.f77modulename = 'anaxv'
     pyfcode = crackfortran.crack2fortran(crackfortran.crackfortran(['src/anaxv.f90']))
     f = open('src/anaxv.pyf', 'w')
+    f.write(pyfcode)
+    f.close()
+    crackfortran.f77modulename = '_optimec'
+    pyfcode = crackfortran.crack2fortran(crackfortran.crackfortran(['src/optimec.f90']))
+    f = open('src/optimec.pyf', 'w')
     f.write(pyfcode)
     f.close()
 
@@ -117,8 +123,9 @@ if __name__=='__main__':
     
         # Fortran wrapper
         ext_modules = [
-            Extension('spanlib._fortran', spanlib_files, **kwext), 
-            Extension('spanlib.anaxv', anaxv_files, **kwext)
+            Extension('spanlib._core', spanlib_files, **kwext), 
+            Extension('spanlib.anaxv', anaxv_files, **kwext), 
+            Extension('spanlib._optimec', optimec_files, **kwext)
         ],
           
         # Install these to their own directory
